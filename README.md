@@ -1,5 +1,5 @@
 (EM DESENVOLVIMENTO)
-API desenvolvida para fazer o registro de ocorrências que fazendas solicitam suporte.
+API desenvolvida em Spring Boot para fazer o registro de ocorrências que fazendas solicitam suporte.
 
 - funções -
 Usuario CRUD
