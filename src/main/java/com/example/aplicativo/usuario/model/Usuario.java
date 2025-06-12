@@ -36,6 +36,6 @@ public class Usuario implements Serializable {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
-    private Role role;
+    private RoleUser role;
 
 }

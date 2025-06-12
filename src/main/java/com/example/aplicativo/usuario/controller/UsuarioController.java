@@ -1,8 +1,42 @@
 package com.example.aplicativo.usuario.controller;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.aplicativo.erroStatus.ErrorResponse;
+import com.example.aplicativo.usuario.dto.UsuarioDTO;
+import com.example.aplicativo.usuario.model.Usuario;
+import com.example.aplicativo.usuario.service.UsuarioService;
 
 @RestController
 public class UsuarioController {
+
+    private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
+
+    @PostMapping("/cadastro/usuario")
+    public ResponseEntity<?> criarUsuario(@RequestBody UsuarioDTO usuarioDTO) {
+        try {
+            usuarioService.criarUsuario(usuarioDTO);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorResponse("Erro interno do servidor: " + e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/listar/usuario")
+    public ResponseEntity<List<Usuario>> listarUsuario() {
+        return ResponseEntity.status(201).body(usuarioService.listUser());
+    }
 
 }
