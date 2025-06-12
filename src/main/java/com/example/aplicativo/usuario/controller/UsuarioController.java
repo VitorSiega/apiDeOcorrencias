@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,8 +37,40 @@ public class UsuarioController {
         }
     }
 
+    @PutMapping("/atualizar/usuario/{id}")
+    public ResponseEntity<?> atualizarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
+        try {
+            usuarioService.atualizarUsuario(id, usuarioDTO);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorResponse("Erro interno do servidor: " + e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/deletar/usuario/{id}")
+    public ResponseEntity<?> deletarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
+        try {
+            usuarioService.deletarUsuario(id);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorResponse("Erro interno do servidor: " + e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/listar/usuario/{id}")
+    public ResponseEntity<?> ListarUsuario(@PathVariable Long id) {
+        try {
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(usuarioService.buscarUsuario(id));
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorResponse("Erro interno do servidor: " + e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/listar/usuario")
-    public ResponseEntity<List<Usuario>> listarUsuario() {
+    public ResponseEntity<List<Usuario>> listarTodosUsuario() {
         return ResponseEntity.status(201).body(usuarioService.listUser());
     }
 
