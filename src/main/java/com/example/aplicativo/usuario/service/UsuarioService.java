@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 
 import com.example.aplicativo.usuario.dto.UsuarioDTO;
 import com.example.aplicativo.usuario.enums.RoleEnum;
+import com.example.aplicativo.usuario.model.Login;
 import com.example.aplicativo.usuario.model.RoleFunc;
 import com.example.aplicativo.usuario.model.RoleUser;
 import com.example.aplicativo.usuario.model.Usuario;
+import com.example.aplicativo.usuario.repository.LoginRepository;
 import com.example.aplicativo.usuario.repository.RoleRepository;
 import com.example.aplicativo.usuario.repository.UsuarioRepository;
 
@@ -17,10 +19,13 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final RoleRepository roleRepository;
+    private final LoginRepository loginRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, RoleRepository roleRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, RoleRepository roleRepository,
+            LoginRepository loginRepository) {
         this.usuarioRepository = usuarioRepository;
         this.roleRepository = roleRepository;
+        this.loginRepository = loginRepository;
     }
 
     public void criarUsuario(UsuarioDTO usuarioDTO) {
@@ -33,6 +38,14 @@ public class UsuarioService {
                 .build();
 
         usuarioRepository.save(usuario);
+
+        Login login = Login.builder()
+                .user(usuario)
+                .email(usuarioDTO.email())
+                .senha(usuarioDTO.senha())
+                .build();
+
+        loginRepository.save(login);
 
     }
 
