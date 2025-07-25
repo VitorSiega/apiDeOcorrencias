@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name = "user")
 @Entity
-public class Usuario implements Serializable {
+public class UsuarioModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +36,6 @@ public class Usuario implements Serializable {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
-    private RoleUser role;
+    private RoleUserModel role;
 
 }

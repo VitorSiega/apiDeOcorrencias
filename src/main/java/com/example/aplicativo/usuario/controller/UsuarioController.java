@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.aplicativo.erroStatus.ErrorResponse;
 import com.example.aplicativo.usuario.dto.UsuarioDTO;
-import com.example.aplicativo.usuario.model.Usuario;
+import com.example.aplicativo.usuario.model.UsuarioModel;
 import com.example.aplicativo.usuario.service.UsuarioService;
 
 @RestController
@@ -70,7 +70,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/listar/usuario")
-    public ResponseEntity<List<Usuario>> listarTodosUsuario() {
+    public ResponseEntity<List<UsuarioModel>> listarTodosUsuario() {
         return ResponseEntity.status(201).body(usuarioService.listUser());
     }
 

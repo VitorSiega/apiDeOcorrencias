@@ -8,12 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.aplicativo.login.model.ModelUserDetailsImpl;
-import com.example.aplicativo.usuario.model.Login;
+import com.example.aplicativo.usuario.model.LoginModel;
 import com.example.aplicativo.usuario.repository.LoginRepository;
-
-//import com.example.projeto.login.model.ModelUser;
-//import com.example.projeto.login.model.ModelUserDetailsImpl;
-//import com.example.projeto.login.repository.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -34,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         // Procura o usuário pelo email
-        Login user = loginRepository.findByEmail(email)
+        LoginModel user = loginRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     logger.warn("Usuário não encontrado com o email: {}", email);
                     return new UsernameNotFoundException("User not found with email: " + email);
@@ -42,12 +38,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         // Retorna uma instância de ModelUserDetailsImpl com as informações do usuário
         // encontrado
+        // return new ModelUserDetailsImpl(user);
         return new ModelUserDetailsImpl(user);
     }
 
     public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
         // Procura o usuário pelo ID
-        Login user = loginRepository.findById(id)
+        LoginModel user = loginRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
 
         // Retorna uma instância de ModelUserDetailsImpl com as informações do usuário

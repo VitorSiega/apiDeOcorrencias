@@ -1,12 +1,13 @@
 package com.example.aplicativo.usuario.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -18,22 +19,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-@Table(name = "acess_user")
+@Table(name = "role_user")
 @Entity
-public class Login {
+public class RoleUserModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private Usuario user;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "role_func_id")
+    private RoleFuncModel role; // aqui é uma entidade, sem @Enumerated
 
-    @Column(name = "email", nullable = false, unique = true, columnDefinition = "VARCHAR(100)")
-    private String email;
-
-    @Column(name = "senha", nullable = false, columnDefinition = "VARCHAR(100)")
-    private String senha;
+    @JsonBackReference
+    @OneToOne(mappedBy = "role")
+    private UsuarioModel user;
 
 }

@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name = "roles")
 @Entity
-public class RoleFunc {
+public class RoleFuncModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.aplicativo.usuario.dto.UsuarioDTO;
 import com.example.aplicativo.usuario.enums.RoleEnum;
-import com.example.aplicativo.usuario.model.Login;
-import com.example.aplicativo.usuario.model.RoleFunc;
-import com.example.aplicativo.usuario.model.RoleUser;
-import com.example.aplicativo.usuario.model.Usuario;
+import com.example.aplicativo.usuario.model.LoginModel;
+import com.example.aplicativo.usuario.model.RoleFuncModel;
+import com.example.aplicativo.usuario.model.RoleUserModel;
+import com.example.aplicativo.usuario.model.UsuarioModel;
 import com.example.aplicativo.usuario.repository.LoginRepository;
 import com.example.aplicativo.usuario.repository.RoleRepository;
 import com.example.aplicativo.usuario.repository.UsuarioRepository;
@@ -30,7 +30,7 @@ public class UsuarioService {
 
     public void criarUsuario(UsuarioDTO usuarioDTO) {
 
-        Usuario usuario = Usuario.builder()
+        UsuarioModel usuario = UsuarioModel.builder()
                 .nome(usuarioDTO.nome())
                 .telefone(usuarioDTO.telefone())
                 .unidade(usuarioDTO.unidade())
@@ -39,7 +39,7 @@ public class UsuarioService {
 
         usuarioRepository.save(usuario);
 
-        Login login = Login.builder()
+        LoginModel login = LoginModel.builder()
                 .user(usuario)
                 .email(usuarioDTO.email())
                 .senha(usuarioDTO.senha())
@@ -50,7 +50,7 @@ public class UsuarioService {
     }
 
     public void atualizarUsuario(Long id, UsuarioDTO usuarioDTO) {
-        Usuario userAtual = usuarioRepository.findById(id)
+        UsuarioModel userAtual = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         userAtual.setNome(usuarioDTO.nome());
@@ -65,20 +65,20 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 
-    public Usuario buscarUsuario(Long id) {
+    public UsuarioModel buscarUsuario(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
-    public List<Usuario> listUser() {
+    public List<UsuarioModel> listUser() {
         return usuarioRepository.findAll();
     }
 
-    private RoleUser verificaRole(RoleEnum role) {
-        RoleFunc roleNewUser = roleRepository.findByName(role)
+    private RoleUserModel verificaRole(RoleEnum role) {
+        RoleFuncModel roleNewUser = roleRepository.findByName(role)
                 .orElseThrow(() -> new RuntimeException("Role não encontrada"));
 
-        RoleUser roleUser = RoleUser.builder()
+        RoleUserModel roleUser = RoleUserModel.builder()
                 .role(roleNewUser)
                 .build();
         return roleUser;

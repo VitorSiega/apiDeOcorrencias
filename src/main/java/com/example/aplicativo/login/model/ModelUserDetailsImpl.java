@@ -7,17 +7,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.example.aplicativo.usuario.model.Login;
-import com.example.aplicativo.usuario.model.Usuario;
+import com.example.aplicativo.usuario.model.LoginModel;
+import com.example.aplicativo.usuario.model.UsuarioModel;
 
 import lombok.Getter;
 
 @Getter
 public class ModelUserDetailsImpl implements UserDetails {
 
-    private final Login login;
+    private final LoginModel login;
 
-    public ModelUserDetailsImpl(Login login) {
+    public ModelUserDetailsImpl(LoginModel login) {
         this.login = login;
     }
 
@@ -37,7 +37,7 @@ public class ModelUserDetailsImpl implements UserDetails {
         return login.getEmail();
     }
 
-    public Usuario getModelUser() {
+    public UsuarioModel getModelUser() {
         return this.login.getUser();
     }
 
