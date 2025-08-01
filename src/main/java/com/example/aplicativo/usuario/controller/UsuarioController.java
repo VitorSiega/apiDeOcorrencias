@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.aplicativo.erroStatus.ErrorResponse;
@@ -37,10 +39,25 @@ public class UsuarioController {
         }
     }
 
-    @PutMapping("/atualizar/usuario/{id}")
-    public ResponseEntity<?> atualizarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
+    // opção do usuario atualizar seu propio perfil
+    @PutMapping("/atualizar/usuario")
+    public ResponseEntity<?> atualizarUsuarioAtual(@RequestBody UsuarioDTO usuarioDTO,
+            @RequestHeader("Authorization") String authorizationHeader) {
         try {
-            usuarioService.atualizarUsuario(id, usuarioDTO);
+            usuarioService.atualizarUsuarioAtual(usuarioDTO, authorizationHeader);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorResponse("Erro interno do servidor: " + e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // opção do administrador atualizar usuario
+    @PutMapping("/atualizar/administrador/usuario/{id}")
+    public ResponseEntity<?> administradorAtualizarUsuario(@RequestBody UsuarioDTO usuarioDTO,
+            @RequestHeader("Authorization") String authorizationHeader, @RequestParam Long id) {
+        try {
+            usuarioService.atualizarUsuario(usuarioDTO, id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorResponse("Erro interno do servidor: " + e.getMessage()),

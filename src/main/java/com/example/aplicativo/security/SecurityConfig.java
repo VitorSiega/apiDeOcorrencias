@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // .requestMatchers("/login", "/token/role", "/token/verify").permitAll()
-                        // .requestMatchers("/administrador/**").hasAnyAuthority("ADMINISTRADOR")
+                        // .requestMatchers("/atualizar/usuario").hasAnyAuthority("ADMINISTRADOR")
                         .anyRequest().permitAll())
                 .addFilterBefore(userAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();

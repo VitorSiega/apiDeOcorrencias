@@ -2,8 +2,10 @@ package com.example.aplicativo.usuario.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.aplicativo.login.service.JwtTokenService;
 import com.example.aplicativo.usuario.dto.UsuarioDTO;
 import com.example.aplicativo.usuario.enums.RoleEnum;
 import com.example.aplicativo.usuario.model.LoginModel;
@@ -20,12 +22,16 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final RoleRepository roleRepository;
     private final LoginRepository loginRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenService jwtTokenService;
 
     public UsuarioService(UsuarioRepository usuarioRepository, RoleRepository roleRepository,
-            LoginRepository loginRepository) {
+            LoginRepository loginRepository, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService) {
         this.usuarioRepository = usuarioRepository;
         this.roleRepository = roleRepository;
         this.loginRepository = loginRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenService = jwtTokenService;
     }
 
     public void criarUsuario(UsuarioDTO usuarioDTO) {
@@ -42,14 +48,16 @@ public class UsuarioService {
         LoginModel login = LoginModel.builder()
                 .user(usuario)
                 .email(usuarioDTO.email())
-                .senha(usuarioDTO.senha())
+                .senha(passwordEncoder.encode(usuarioDTO.senha()))
                 .build();
 
         loginRepository.save(login);
 
     }
 
-    public void atualizarUsuario(Long id, UsuarioDTO usuarioDTO) {
+    // Atualiza o propio usuario, função de usuario
+    public void atualizarUsuarioAtual(UsuarioDTO usuarioDTO, String authorization) {
+        Long id = jwtTokenService.pegarId(authorization.substring(7));
         UsuarioModel userAtual = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
@@ -57,6 +65,18 @@ public class UsuarioService {
         userAtual.setTelefone(usuarioDTO.telefone());
         userAtual.setUnidade(usuarioDTO.unidade());
         userAtual.setRole(verificaRole(usuarioDTO.roleUser()));
+
+        usuarioRepository.save(userAtual);
+    }
+
+    // Atualiza o propio usuario, função de usuario
+    public void atualizarUsuario(UsuarioDTO usuarioDTO, Long id) {
+        UsuarioModel userAtual = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        userAtual.setNome(usuarioDTO.nome());
+        userAtual.setTelefone(usuarioDTO.telefone());
+        userAtual.setUnidade(usuarioDTO.unidade());
 
         usuarioRepository.save(userAtual);
     }
