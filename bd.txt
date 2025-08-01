@@ -1,0 +1,76 @@
+create schema sistema;
+use sistema;
+
+select * from roles;
+-- Tabela 'roles' (RoleFunc)
+CREATE TABLE roles (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+-- Tabela 'role_user' (RoleUser)
+select * from role_user;
+CREATE TABLE role_user (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    role_func_id BIGINT NOT NULL,
+    CONSTRAINT fk_role_func FOREIGN KEY (role_func_id) REFERENCES roles(id)
+);
+
+select * from user;
+-- Tabela 'user' (Usuario)
+CREATE TABLE user (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    telefone VARCHAR(14),
+    unidade VARCHAR(50) NOT NULL,
+    role_id BIGINT,
+    CONSTRAINT fk_role_user FOREIGN KEY (role_id) REFERENCES role_user(id)
+);
+
+-- Tabela 'acess_user' (Login)
+select * from acess_user;
+CREATE TABLE acess_user (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(100) NOT NULL,
+    CONSTRAINT fk_user_login FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
+-- Remove FK de user → role_user
+ALTER TABLE user DROP FOREIGN KEY fk_role_user;
+
+-- Remove FK de acess_user → user
+ALTER TABLE acess_user DROP FOREIGN KEY fk_user_login;
+
+-- Adiciona FK de user → role_user com delete em cascata
+ALTER TABLE user
+ADD CONSTRAINT fk_role_user
+FOREIGN KEY (role_id)
+REFERENCES role_user(id)
+ON DELETE CASCADE;
+
+-- Adiciona FK de acess_user → user com delete em cascata
+ALTER TABLE acess_user
+ADD CONSTRAINT fk_user_login
+FOREIGN KEY (user_id)
+REFERENCES user(id)
+ON DELETE CASCADE;
+
+
+
+CREATE TABLE produto (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    codigoproduto BIGINT NOT NULL UNIQUE,
+    nomeproduto VARCHAR(100) NOT NULL,
+    categoriaproduto VARCHAR(100) NOT NULL,
+    marcaproduto VARCHAR(100) NOT NULL,
+    modeloproduto VARCHAR(100) NOT NULL,
+    statusproduto VARCHAR(50) NOT NULL
+);
+
+
+PASSWDBD = vige9123
+USERBD = root
+URLBD = localhost:3306/sistema
+TOKENSECRET = vige9123
