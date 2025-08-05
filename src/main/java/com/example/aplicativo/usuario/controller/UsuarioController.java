@@ -19,6 +19,8 @@ import com.example.aplicativo.usuario.dto.UsuarioDTO;
 import com.example.aplicativo.usuario.model.UsuarioModel;
 import com.example.aplicativo.usuario.service.UsuarioService;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class UsuarioController {
 
@@ -29,9 +31,13 @@ public class UsuarioController {
     }
 
     @PostMapping("/cadastro/usuario")
-    public ResponseEntity<?> criarUsuario(@RequestBody UsuarioDTO usuarioDTO) {
+    public ResponseEntity<?> criarUsuario(@RequestBody @Valid UsuarioDTO usuarioDTO) {
         try {
-            usuarioService.criarUsuario(usuarioDTO);
+            if (usuarioDTO.usuarioComLogin()) {
+                usuarioService.criarUsuarioComLogin(usuarioDTO);
+            } else {
+                usuarioService.criarUsuario(usuarioDTO);
+            }
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorResponse("Erro interno do servidor: " + e.getMessage()),

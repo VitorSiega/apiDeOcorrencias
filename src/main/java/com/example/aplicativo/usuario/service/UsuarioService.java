@@ -34,7 +34,42 @@ public class UsuarioService {
         this.jwtTokenService = jwtTokenService;
     }
 
+    // public void criarUsuario(UsuarioDTO usuarioDTO) {
+
+    // UsuarioModel usuario = UsuarioModel.builder()
+    // .nome(usuarioDTO.nome())
+    // .telefone(usuarioDTO.telefone())
+    // .unidade(usuarioDTO.unidade())
+    // .role(verificaRole(usuarioDTO.roleUser()))
+    // .build();
+
+    // usuarioRepository.save(usuario);
+
+    // LoginModel login = LoginModel.builder()
+    // .user(usuario)
+    // .email(usuarioDTO.email())
+    // .senha(passwordEncoder.encode(usuarioDTO.senha()))
+    // .build();
+
+    // loginRepository.save(login);
+
+    // }
+
     public void criarUsuario(UsuarioDTO usuarioDTO) {
+        UsuarioModel novoUsuario = criarUsuarioBase(usuarioDTO);
+        usuarioRepository.save(novoUsuario);
+    }
+
+    public void criarUsuarioComLogin(UsuarioDTO usuarioDTO) {
+        UsuarioModel novoUsuario = criarUsuarioBase(usuarioDTO);
+        usuarioRepository.save(novoUsuario);
+        LoginModel novoLogin = criarLoginUsuario(usuarioDTO, novoUsuario);
+        loginRepository.save(novoLogin);
+    }
+
+    private UsuarioModel criarUsuarioBase(UsuarioDTO usuarioDTO) {
+        if (usuarioDTO.usuarioComLogin())
+            verificarDadosUsuario(usuarioDTO);
 
         UsuarioModel usuario = UsuarioModel.builder()
                 .nome(usuarioDTO.nome())
@@ -43,19 +78,28 @@ public class UsuarioService {
                 .role(verificaRole(usuarioDTO.roleUser()))
                 .build();
 
-        usuarioRepository.save(usuario);
-
-        LoginModel login = LoginModel.builder()
-                .user(usuario)
-                .email(usuarioDTO.email())
-                .senha(passwordEncoder.encode(usuarioDTO.senha()))
-                .build();
-
-        loginRepository.save(login);
-
+        return usuario;
     }
 
-    // Atualiza o propio usuario, função de usuario
+    private LoginModel criarLoginUsuario(UsuarioDTO usuarioDTO, UsuarioModel novoUsuario) {
+        LoginModel novoLogin = LoginModel.builder()
+                .email(usuarioDTO.email())
+                .senha(passwordEncoder.encode(usuarioDTO.senha()))
+                .user(novoUsuario)
+                .build();
+
+        return novoLogin;
+    }
+
+    // função para verificar se todos os dados do cliente/usuario foram preenchidos
+    // corretamente
+    private void verificarDadosUsuario(UsuarioDTO usuarioDTO) {
+        if (loginRepository.findByEmail(usuarioDTO.email()).isPresent()) {
+            throw new IllegalArgumentException("E-mail já existente!");
+        }
+    }
+
+    // Administrador atualiza o usuario
     public void atualizarUsuarioAtual(UsuarioDTO usuarioDTO, String authorization) {
         Long id = jwtTokenService.pegarId(authorization.substring(7));
         UsuarioModel userAtual = usuarioRepository.findById(id)
