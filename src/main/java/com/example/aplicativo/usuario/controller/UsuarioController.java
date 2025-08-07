@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.aplicativo.erroStatus.ErrorResponse;
+import com.example.aplicativo.usuario.dto.AtualizacaoUsuarioDTO;
 import com.example.aplicativo.usuario.dto.UsuarioDTO;
 import com.example.aplicativo.usuario.model.UsuarioModel;
 import com.example.aplicativo.usuario.service.UsuarioService;
@@ -46,11 +47,11 @@ public class UsuarioController {
     }
 
     // opção do usuario atualizar seu propio perfil
-    @PutMapping("/atualizar/usuario")
-    public ResponseEntity<?> atualizarUsuarioAtual(@RequestBody UsuarioDTO usuarioDTO,
-            @RequestHeader("Authorization") String authorizationHeader) {
+    @PutMapping("/administrador/atualizar/usuario/{id}")
+    public ResponseEntity<?> atualizarUsuarioAtualPorUmAdministrador(@RequestBody AtualizacaoUsuarioDTO usuarioDTO,
+            @PathVariable Long id, @RequestHeader("Authorization") String authorizationHeader) {
         try {
-            usuarioService.atualizarUsuarioAtual(usuarioDTO, authorizationHeader);
+            usuarioService.atualizarDadosCadastraisUsuarioPorAdministrador(usuarioDTO, id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorResponse("Erro interno do servidor: " + e.getMessage()),
@@ -94,7 +95,7 @@ public class UsuarioController {
 
     @GetMapping("/listar/usuario")
     public ResponseEntity<List<UsuarioModel>> listarTodosUsuario() {
-        return ResponseEntity.status(201).body(usuarioService.listUser());
+        return ResponseEntity.status(200).body(usuarioService.listUser());
     }
 
 }

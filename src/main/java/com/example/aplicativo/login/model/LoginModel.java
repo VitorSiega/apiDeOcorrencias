@@ -1,4 +1,7 @@
-package com.example.aplicativo.usuario.model;
+package com.example.aplicativo.login.model;
+
+import com.example.aplicativo.usuario.model.UsuarioModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -33,6 +36,7 @@ public class LoginModel {
     @Column(name = "email", nullable = false, unique = true, columnDefinition = "VARCHAR(100)")
     private String email;
 
+    @JsonIgnore
     @Column(name = "senha", nullable = false, columnDefinition = "VARCHAR(100)")
     private String senha;
 

@@ -7,7 +7,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.example.aplicativo.usuario.model.LoginModel;
 import com.example.aplicativo.usuario.model.UsuarioModel;
 
 import lombok.Getter;

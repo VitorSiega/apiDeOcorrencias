@@ -2,5 +2,7 @@ package com.example.aplicativo.usuario.enums;
 
 public enum RoleEnum {
     ADMINISTRADOR,
-    SUPORTE
+    SUPORTE,
+    CLIENTE,
+    USUARIO
 }

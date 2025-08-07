@@ -5,61 +5,47 @@ import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.aplicativo.login.model.LoginModel;
+import com.example.aplicativo.login.repository.LoginRepository;
 import com.example.aplicativo.login.service.JwtTokenService;
+import com.example.aplicativo.usuario.dto.AtualizacaoUsuarioDTO;
 import com.example.aplicativo.usuario.dto.UsuarioDTO;
 import com.example.aplicativo.usuario.enums.RoleEnum;
-import com.example.aplicativo.usuario.model.LoginModel;
 import com.example.aplicativo.usuario.model.RoleFuncModel;
 import com.example.aplicativo.usuario.model.RoleUserModel;
 import com.example.aplicativo.usuario.model.UsuarioModel;
-import com.example.aplicativo.usuario.repository.LoginRepository;
 import com.example.aplicativo.usuario.repository.RoleRepository;
+import com.example.aplicativo.usuario.repository.RoleUserRepository;
 import com.example.aplicativo.usuario.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final RoleUserRepository roleUserRepository;
     private final RoleRepository roleRepository;
     private final LoginRepository loginRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
 
     public UsuarioService(UsuarioRepository usuarioRepository, RoleRepository roleRepository,
-            LoginRepository loginRepository, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService) {
+            LoginRepository loginRepository, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService,
+            RoleUserRepository roleUserRepository) {
         this.usuarioRepository = usuarioRepository;
         this.roleRepository = roleRepository;
         this.loginRepository = loginRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenService = jwtTokenService;
+        this.roleUserRepository = roleUserRepository;
     }
 
-    // public void criarUsuario(UsuarioDTO usuarioDTO) {
-
-    // UsuarioModel usuario = UsuarioModel.builder()
-    // .nome(usuarioDTO.nome())
-    // .telefone(usuarioDTO.telefone())
-    // .unidade(usuarioDTO.unidade())
-    // .role(verificaRole(usuarioDTO.roleUser()))
-    // .build();
-
-    // usuarioRepository.save(usuario);
-
-    // LoginModel login = LoginModel.builder()
-    // .user(usuario)
-    // .email(usuarioDTO.email())
-    // .senha(passwordEncoder.encode(usuarioDTO.senha()))
-    // .build();
-
-    // loginRepository.save(login);
-
-    // }
-
+    // cria um usuario sem login
     public void criarUsuario(UsuarioDTO usuarioDTO) {
         UsuarioModel novoUsuario = criarUsuarioBase(usuarioDTO);
         usuarioRepository.save(novoUsuario);
     }
 
+    // cria um usuario com login
     public void criarUsuarioComLogin(UsuarioDTO usuarioDTO) {
         UsuarioModel novoUsuario = criarUsuarioBase(usuarioDTO);
         usuarioRepository.save(novoUsuario);
@@ -67,6 +53,7 @@ public class UsuarioService {
         loginRepository.save(novoLogin);
     }
 
+    // cria um usuario
     private UsuarioModel criarUsuarioBase(UsuarioDTO usuarioDTO) {
         if (usuarioDTO.usuarioComLogin())
             verificarDadosUsuario(usuarioDTO);
@@ -81,11 +68,12 @@ public class UsuarioService {
         return usuario;
     }
 
+    // cria o login do usuario
     private LoginModel criarLoginUsuario(UsuarioDTO usuarioDTO, UsuarioModel novoUsuario) {
         LoginModel novoLogin = LoginModel.builder()
+                .user(novoUsuario)
                 .email(usuarioDTO.email())
                 .senha(passwordEncoder.encode(usuarioDTO.senha()))
-                .user(novoUsuario)
                 .build();
 
         return novoLogin;
@@ -100,17 +88,30 @@ public class UsuarioService {
     }
 
     // Administrador atualiza o usuario
-    public void atualizarUsuarioAtual(UsuarioDTO usuarioDTO, String authorization) {
-        Long id = jwtTokenService.pegarId(authorization.substring(7));
+    public void atualizarDadosCadastraisUsuarioPorAdministrador(AtualizacaoUsuarioDTO usuarioDTO, Long id) {
+
         UsuarioModel userAtual = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         userAtual.setNome(usuarioDTO.nome());
         userAtual.setTelefone(usuarioDTO.telefone());
         userAtual.setUnidade(usuarioDTO.unidade());
-        userAtual.setRole(verificaRole(usuarioDTO.roleUser()));
-
+        userAtual.setRole(verificaRoleUser(usuarioDTO.roleUser(), userAtual.getRole()));
         usuarioRepository.save(userAtual);
+
+        if (usuarioDTO.usuarioComLogin()) {
+            LoginModel loginAtual = loginRepository.findByEmail(usuarioDTO.email())
+                    .orElseThrow(() -> new RuntimeException("E-mail não encontrado"));
+
+            loginAtual.setEmail(usuarioDTO.email());
+
+            String novaSenha = passwordEncoder.encode(usuarioDTO.senha());
+            if (!passwordEncoder.matches(usuarioDTO.senha(), loginAtual.getSenha()) && !usuarioDTO.senha().isEmpty()) {
+                loginAtual.setSenha(novaSenha);
+            }
+            loginRepository.save(loginAtual);
+        }
+
     }
 
     // Atualiza o propio usuario, função de usuario
@@ -146,6 +147,18 @@ public class UsuarioService {
                 .role(roleNewUser)
                 .build();
         return roleUser;
+    }
+
+    private RoleUserModel verificaRoleUser(RoleEnum novaRole, RoleUserModel antigaRole) {
+        RoleUserModel atualizarRole = verificaRole(novaRole);
+        if (!antigaRole.getRole().equals(atualizarRole.getRole())) {
+            RoleUserModel role = roleUserRepository.findById(antigaRole.getId())
+                    .orElseThrow(() -> new RuntimeException("NÂO ERA PRO CE VE ISSO MEU BOM"));
+            role.setRole(atualizarRole.getRole());
+            roleUserRepository.save(role);
+            return role;
+        }
+        return antigaRole;
     }
 
 }
