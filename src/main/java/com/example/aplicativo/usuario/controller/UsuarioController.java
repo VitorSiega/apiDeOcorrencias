@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.aplicativo.erroStatus.ErrorResponse;
@@ -46,7 +45,7 @@ public class UsuarioController {
         }
     }
 
-    // opção do usuario atualizar seu propio perfil
+    // opção do usuario atualizado por um administrador
     @PutMapping("/administrador/atualizar/usuario/{id}")
     public ResponseEntity<?> atualizarUsuarioAtualPorUmAdministrador(@RequestBody AtualizacaoUsuarioDTO usuarioDTO,
             @PathVariable Long id, @RequestHeader("Authorization") String authorizationHeader) {
@@ -60,17 +59,20 @@ public class UsuarioController {
     }
 
     // opção do administrador atualizar usuario
-    @PutMapping("/atualizar/administrador/usuario/{id}")
-    public ResponseEntity<?> administradorAtualizarUsuario(@RequestBody UsuarioDTO usuarioDTO,
-            @RequestHeader("Authorization") String authorizationHeader, @RequestParam Long id) {
-        try {
-            usuarioService.atualizarUsuario(usuarioDTO, id);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ErrorResponse("Erro interno do servidor: " + e.getMessage()),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // @PutMapping("/atualizar/administrador/usuario/{id}")
+    // public ResponseEntity<?> administradorAtualizarUsuario(@RequestBody
+    // UsuarioDTO usuarioDTO,
+    // @RequestHeader("Authorization") String authorizationHeader, @RequestParam
+    // Long id) {
+    // try {
+    // usuarioService.atualizarUsuario(usuarioDTO, id);
+    // return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    // } catch (Exception e) {
+    // return new ResponseEntity<>(new ErrorResponse("Erro interno do servidor: " +
+    // e.getMessage()),
+    // HttpStatus.INTERNAL_SERVER_ERROR);
+    // }
+    // }
 
     @DeleteMapping("/deletar/usuario/{id}")
     public ResponseEntity<?> deletarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {

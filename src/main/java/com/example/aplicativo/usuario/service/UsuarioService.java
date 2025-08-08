@@ -56,7 +56,7 @@ public class UsuarioService {
     // cria um usuario
     private UsuarioModel criarUsuarioBase(UsuarioDTO usuarioDTO) {
         if (usuarioDTO.usuarioComLogin())
-            verificarDadosUsuario(usuarioDTO);
+            verificarDadosUsuarioCriado(usuarioDTO);
 
         UsuarioModel usuario = UsuarioModel.builder()
                 .nome(usuarioDTO.nome())
@@ -81,7 +81,7 @@ public class UsuarioService {
 
     // função para verificar se todos os dados do cliente/usuario foram preenchidos
     // corretamente
-    private void verificarDadosUsuario(UsuarioDTO usuarioDTO) {
+    private void verificarDadosUsuarioCriado(UsuarioDTO usuarioDTO) {
         if (loginRepository.findByEmail(usuarioDTO.email()).isPresent()) {
             throw new IllegalArgumentException("E-mail já existente!");
         }
@@ -103,8 +103,9 @@ public class UsuarioService {
             LoginModel loginAtual = loginRepository.findByEmail(usuarioDTO.email())
                     .orElseThrow(() -> new RuntimeException("E-mail não encontrado"));
 
-            loginAtual.setEmail(usuarioDTO.email());
+            verificarDadosUsuarioAtualizado(usuarioDTO, id);
 
+            loginAtual.setEmail(usuarioDTO.email());
             String novaSenha = passwordEncoder.encode(usuarioDTO.senha());
             if (!passwordEncoder.matches(usuarioDTO.senha(), loginAtual.getSenha()) && !usuarioDTO.senha().isEmpty()) {
                 loginAtual.setSenha(novaSenha);
@@ -114,9 +115,19 @@ public class UsuarioService {
 
     }
 
+    private void verificarDadosUsuarioAtualizado(AtualizacaoUsuarioDTO usuarioDTO, Long id) {
+        LoginModel usuario = loginRepository.findByEmail(usuarioDTO.email())
+                .orElseThrow(() -> new RuntimeException("Usuário inválido"));
+
+        if (loginRepository.findByEmail(usuarioDTO.email()).isPresent() && !usuario.getUser().getId().equals(id)) {
+            throw new IllegalArgumentException("E-mail já existente!");
+        }
+
+    }
+
     // Atualiza o propio usuario, função de usuario
-    public void atualizarUsuario(UsuarioDTO usuarioDTO, Long id) {
-        UsuarioModel userAtual = usuarioRepository.findById(id)
+    public void atualizarUsuario(UsuarioDTO usuarioDTO, String authorization) {
+        UsuarioModel userAtual = usuarioRepository.findById(jwtTokenService.pegarId(authorization))
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         userAtual.setNome(usuarioDTO.nome());
